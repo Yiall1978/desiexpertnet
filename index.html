@@ -1,1 +1,242 @@
-#e16516bb-994a-42d0-8679-29b5797e7ac3
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Timezone Converter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-main: #ffffff;
+            --text-muted: #888888;
+            --accent: #00e676;
+            --border-color: #333;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            text-align: center;
+            font-weight: 700;
+            margin-bottom: 40px;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        /* Slider Styles */
+        .slider-container {
+            background: var(--card-bg);
+            padding: 20px 30px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .slider-container p {
+            margin-top: 0;
+            color: var(--text-muted);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            margin-top: -10px;
+            box-shadow: 0 0 10px rgba(0, 230, 118, 0.5);
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #444;
+            border-radius: 2px;
+        }
+
+        input[type=range]:focus {
+            outline: none;
+        }
+
+        /* Timezone List Styles */
+        .timezone-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .timezone-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .timezone-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent);
+        }
+
+        .tz-info h2 {
+            margin: 0 0 5px 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .tz-info p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .tz-time {
+            text-align: right;
+        }
+
+        .tz-time h3 {
+            margin: 0 0 5px 0;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .tz-time p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 500px) {
+            .timezone-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            .tz-time {
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Every Time Zone (Clone)</h1>
+        
+        <div class="slider-container">
+            <p>Drag to change time globally</p>
+            <!-- 1440 minutes in a 24-hour day -->
+            <input type="range" id="timeSlider" min="0" max="1440" value="720">
+        </div>
+
+        <div class="timezone-list" id="timezoneList">
+            <!-- Timezone cards will be generated here by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // List of cities and their official timezone identifiers
+        const timezones = [
+            { city: "San Francisco", zone: "America/Los_Angeles" },
+            { city: "New York", zone: "America/New_York" },
+            { city: "London", zone: "Europe/London" },
+            { city: "Dhaka", zone: "Asia/Dhaka" },
+            { city: "Tokyo", zone: "Asia/Tokyo" },
+            { city: "Sydney", zone: "Australia/Sydney" }
+        ];
+
+        const slider = document.getElementById('timeSlider');
+        const listContainer = document.getElementById('timezoneList');
+
+        // Create initial cards
+        function initCards() {
+            listContainer.innerHTML = '';
+            timezones.forEach((tz, index) => {
+                const card = document.createElement('div');
+                card.className = 'timezone-card';
+                card.innerHTML = `
+                    <div class="tz-info">
+                        <h2>${tz.city}</h2>
+                        <p>${tz.zone}</p>
+                    </div>
+                    <div class="tz-time">
+                        <h3 id="time-${index}">--:--</h3>
+                        <p id="date-${index}">--</p>
+                    </div>
+                `;
+                listContainer.appendChild(card);
+            });
+        }
+
+        // Update times based on slider value
+        function updateTimes() {
+            const minutes = parseInt(slider.value);
+            
+            // Create a base date (Start of today in UTC)
+            const now = new Date();
+            const baseDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0));
+            
+            // Add slider minutes to the base date
+            baseDate.setUTCMinutes(minutes);
+
+            timezones.forEach((tz, index) => {
+                // Format the time for each specific timezone
+                const timeOptions = { timeZone: tz.zone, hour: '2-digit', minute: '2-digit', hour12: true };
+                const dateOptions = { timeZone: tz.zone, weekday: 'short', month: 'short', day: 'numeric' };
+                
+                const timeString = new Intl.DateTimeFormat('en-US', timeOptions).format(baseDate);
+                const dateString = new Intl.DateTimeFormat('en-US', dateOptions).format(baseDate);
+
+                document.getElementById(`time-${index}`).innerText = timeString;
+                document.getElementById(`date-${index}`).innerText = dateString;
+            });
+        }
+
+        // Initialize and set event listeners
+        initCards();
+        
+        // Set slider to current time initially
+        const currentNow = new Date();
+        const currentMinutes = (currentNow.getUTCHours() * 60) + currentNow.getUTCMinutes();
+        slider.value = currentMinutes;
+        
+        updateTimes(); // Initial update
+
+        // Update when user drags the slider
+        slider.addEventListener('input', updateTimes);
+    </script>
+</body>
+</html>
