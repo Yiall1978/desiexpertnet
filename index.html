@@ -3,240 +3,263 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Timezone Converter</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Every Time Zone: time zone converter, compare time zone difference and find best time for a meeting with one click</title>
     <style>
-        :root {
-            --bg-color: #121212;
-            --card-bg: #1e1e1e;
-            --text-main: #ffffff;
-            --text-muted: #888888;
-            --accent: #00e676;
-            --border-color: #333;
+        /* CSS Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
         body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            display: flex;
-            justify-content: center;
+            background-color: #1a1b1d;
+            color: #ffffff;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
-        .container {
-            width: 100%;
-            max-width: 800px;
-            padding: 40px 20px;
+        /* Top Navigation Bar (Purple Gradient) */
+        .top-nav {
+            background: linear-gradient(90deg, #370659 0%, #150029 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 52px;
+            padding: 0 20px;
+            border-bottom: 1px solid #111;
         }
 
-        h1 {
-            text-align: center;
-            font-weight: 700;
-            margin-bottom: 40px;
-            color: var(--text-main);
-            letter-spacing: -0.5px;
+        .nav-left {
+            display: flex;
+            align-items: center;
+            height: 100%;
         }
 
-        /* Slider Styles */
-        .slider-container {
-            background: var(--card-bg);
-            padding: 20px 30px;
-            border-radius: 12px;
-            margin-bottom: 40px;
-            border: 1px solid var(--border-color);
-            text-align: center;
-        }
-
-        .slider-container p {
-            margin-top: 0;
-            color: var(--text-muted);
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        input[type=range] {
-            -webkit-appearance: none;
-            width: 100%;
-            background: transparent;
-        }
-
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 24px;
-            width: 24px;
-            border-radius: 50%;
-            background: var(--accent);
+        .menu-icon {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
             cursor: pointer;
-            margin-top: -10px;
-            box-shadow: 0 0 10px rgba(0, 230, 118, 0.5);
+            margin-right: 15px;
         }
 
-        input[type=range]::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 4px;
-            cursor: pointer;
-            background: #444;
+        .menu-icon span {
+            display: block;
+            height: 2px;
+            background-color: #fff;
             border-radius: 2px;
         }
 
-        input[type=range]:focus {
-            outline: none;
+        .menu-icon span:nth-child(1) { width: 20px; }
+        .menu-icon span:nth-child(2) { width: 14px; margin-left: 6px; }
+        .menu-icon span:nth-child(3) { width: 20px; }
+
+        .brand-name {
+            font-size: 16px;
+            font-weight: 500;
+            margin-right: 15px;
+            letter-spacing: 0.3px;
         }
 
-        /* Timezone List Styles */
-        .timezone-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+        .tagline {
+            font-size: 10px;
+            color: #d1b3ff;
+            line-height: 1.2;
+            padding-left: 15px;
+            border-left: 1px solid rgba(255, 255, 255, 0.15);
+            margin-right: 30px;
         }
 
-        .timezone-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px 25px;
+        .nav-links {
             display: flex;
-            justify-content: space-between;
+            height: 100%;
+        }
+
+        .nav-link {
+            display: flex;
             align-items: center;
-            transition: transform 0.2s, border-color 0.2s;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 14px;
+            padding: 0 16px;
+            border-left: 1px solid rgba(255, 255, 255, 0.05);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            margin-left: -1px;
+            transition: background 0.2s;
         }
 
-        .timezone-card:hover {
-            transform: translateY(-2px);
-            border-color: var(--accent);
+        .nav-link:hover, .nav-link.active {
+            background: rgba(255, 255, 255, 0.05);
         }
 
-        .tz-info h2 {
-            margin: 0 0 5px 0;
+        .nav-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .sign-in {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        /* Badges (Pro / New) */
+        .badge {
+            font-size: 10px;
+            padding: 1px 4px;
+            border-radius: 3px;
+            margin-left: 6px;
+            text-transform: capitalize;
+        }
+
+        .badge-outline {
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .badge-filled {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 1px solid transparent;
+        }
+
+        /* Secondary Toolbar */
+        .toolbar {
+            background-color: #232428;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            border-bottom: 1px solid #111;
+        }
+
+        .toolbar-left, .toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .date-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-right: 10px;
+        }
+
+        .calendar-icon {
+            width: 16px;
+            height: 16px;
+            fill: #ffffff;
+        }
+
+        .date-text {
             font-size: 18px;
-            font-weight: 600;
-        }
-
-        .tz-info p {
-            margin: 0;
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        .tz-time {
-            text-align: right;
-        }
-
-        .tz-time h3 {
-            margin: 0 0 5px 0;
-            font-size: 28px;
             font-weight: 700;
-            color: var(--accent);
+            border-bottom: 2px dotted #555;
+            padding-bottom: 2px;
+            cursor: pointer;
         }
 
-        .tz-time p {
-            margin: 0;
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 28px;
+            padding: 0 12px;
+            border: none;
+            border-radius: 4px;
             font-size: 13px;
-            color: var(--text-muted);
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            color: #ffffff;
+            transition: opacity 0.2s;
         }
 
-        @media (max-width: 500px) {
-            .timezone-card {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-            .tz-time {
-                text-align: left;
-            }
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn-blue {
+            background-color: #4b8df8;
+        }
+
+        .btn-twitter {
+            background-color: #1da1f2;
+            gap: 6px;
+        }
+
+        .twitter-icon {
+            width: 14px;
+            height: 14px;
+            fill: #ffffff;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex-grow: 1;
+            background-color: #1e1e20;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Every Time Zone (Clone)</h1>
-        
-        <div class="slider-container">
-            <p>Drag to change time globally</p>
-            <!-- 1440 minutes in a 24-hour day -->
-            <input type="range" id="timeSlider" min="0" max="1440" value="720">
+    <!-- Top Navigation -->
+    <header class="top-nav">
+        <div class="nav-left">
+            <div class="menu-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="brand-name">Every Time Zone</div>
+            <div class="tagline">Never warp your brain with<br>time zone math again.</div>
+            
+            <nav class="nav-links">
+                <a href="#" class="nav-link active">Timeline</a>
+                <a href="#" class="nav-link">Meetings <span class="badge badge-outline">Pro</span></a>
+                <a href="#" class="nav-link">People <span class="badge badge-outline">Pro</span></a>
+            </nav>
         </div>
+        <div class="nav-right">
+            <a href="#" class="sign-in">Sign In</a>
+        </div>
+    </header>
 
-        <div class="timezone-list" id="timezoneList">
-            <!-- Timezone cards will be generated here by JavaScript -->
+    <!-- Secondary Toolbar -->
+    <div class="toolbar">
+        <div class="toolbar-left">
+            <div class="date-display">
+                <!-- SVG Calendar Icon -->
+                <svg class="calendar-icon" viewBox="0 0 24 24">
+                    <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2zm-7 5h5v5h-5z"/>
+                </svg>
+                <div class="date-text">June 28 – July 3</div>
+            </div>
+            
+            <button class="btn btn-blue">Share Link</button>
+            <button class="btn btn-blue">Share iCal <span class="badge badge-filled">Pro</span></button>
+            <button class="btn btn-twitter">
+                <!-- SVG Twitter Icon -->
+                <svg class="twitter-icon" viewBox="0 0 24 24">
+                    <path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.05c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z"/>
+                </svg>
+                Tweet
+            </button>
+        </div>
+        <div class="toolbar-right">
+            <button class="btn btn-blue">Customize <span class="badge badge-filled">new</span></button>
         </div>
     </div>
 
-    <script>
-        // List of cities and their official timezone identifiers
-        const timezones = [
-            { city: "San Francisco", zone: "America/Los_Angeles" },
-            { city: "New York", zone: "America/New_York" },
-            { city: "London", zone: "Europe/London" },
-            { city: "Dhaka", zone: "Asia/Dhaka" },
-            { city: "Tokyo", zone: "Asia/Tokyo" },
-            { city: "Sydney", zone: "Australia/Sydney" }
-        ];
+    <!-- Main Content Body (Empty Dark Space as per image) -->
+    <main class="main-content">
+        <!-- Dashboard components would go here -->
+    </main>
 
-        const slider = document.getElementById('timeSlider');
-        const listContainer = document.getElementById('timezoneList');
-
-        // Create initial cards
-        function initCards() {
-            listContainer.innerHTML = '';
-            timezones.forEach((tz, index) => {
-                const card = document.createElement('div');
-                card.className = 'timezone-card';
-                card.innerHTML = `
-                    <div class="tz-info">
-                        <h2>${tz.city}</h2>
-                        <p>${tz.zone}</p>
-                    </div>
-                    <div class="tz-time">
-                        <h3 id="time-${index}">--:--</h3>
-                        <p id="date-${index}">--</p>
-                    </div>
-                `;
-                listContainer.appendChild(card);
-            });
-        }
-
-        // Update times based on slider value
-        function updateTimes() {
-            const minutes = parseInt(slider.value);
-            
-            // Create a base date (Start of today in UTC)
-            const now = new Date();
-            const baseDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0));
-            
-            // Add slider minutes to the base date
-            baseDate.setUTCMinutes(minutes);
-
-            timezones.forEach((tz, index) => {
-                // Format the time for each specific timezone
-                const timeOptions = { timeZone: tz.zone, hour: '2-digit', minute: '2-digit', hour12: true };
-                const dateOptions = { timeZone: tz.zone, weekday: 'short', month: 'short', day: 'numeric' };
-                
-                const timeString = new Intl.DateTimeFormat('en-US', timeOptions).format(baseDate);
-                const dateString = new Intl.DateTimeFormat('en-US', dateOptions).format(baseDate);
-
-                document.getElementById(`time-${index}`).innerText = timeString;
-                document.getElementById(`date-${index}`).innerText = dateString;
-            });
-        }
-
-        // Initialize and set event listeners
-        initCards();
-        
-        // Set slider to current time initially
-        const currentNow = new Date();
-        const currentMinutes = (currentNow.getUTCHours() * 60) + currentNow.getUTCMinutes();
-        slider.value = currentMinutes;
-        
-        updateTimes(); // Initial update
-
-        // Update when user drags the slider
-        slider.addEventListener('input', updateTimes);
-    </script>
 </body>
 </html>
